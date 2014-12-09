@@ -23,6 +23,12 @@ NS_INLINE BOOL anyAvailable(void) {
     return ptAvailable() || pt2Available();
 }
 
+NS_INLINE BOOL isValidURL(NSURL *URL) {
+    NSString *str = URL.absoluteString;
+    
+    return ([str hasPrefix:@"youtube"] || [string hasPrefix:@"http"]);
+}
+
 NS_INLINE NSDictionary *dictionaryWithQueryString(NSString *string) {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     
@@ -258,7 +264,7 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 publicURLsOnly:(BOOL)arg3 animating:(BOOL)arg4 additionalActivationFlag:(unsigned int)arg5 {
-    if (anyAvailable) {
+    if (anyAvailable && isValidURL()) {
         PTURLResourceType type = 0;
         BOOL isUsername = NO;
         NSString *resource = getResourceFromURL(URL, &type, &isUsername);
@@ -287,7 +293,7 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 {
-    if (anyAvailable) {
+    if (anyAvailable && isValidURL()) {
         PTURLResourceType type = 0;
         BOOL isUsername = NO;
         NSString *resource = getResourceFromURL(URL, &type, &isUsername);
@@ -315,7 +321,7 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 activationHandler:(id)arg6 {
-    if (anyAvailable) {
+    if (anyAvailable && isValidURL()) {
         PTURLResourceType type = 0;
         BOOL isUsername = NO;
         NSString *resource = getResourceFromURL(URL, &type, &isUsername);
@@ -344,7 +350,7 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationContext:(id)arg5 activationHandler:(id)arg6 {
-    if (anyAvailable) {
+    if (anyAvailable && isValidURL()) {
         PTURLResourceType type = 0;
         BOOL isUsername = NO;
         NSString *resource = getResourceFromURL(URL, &type, &isUsername);
@@ -374,7 +380,7 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationSettings:(id)arg5 withResult:(id)arg6 {
-    if (anyAvailable) {
+    if (anyAvailable && isValidURL()) {
         PTURLResourceType type = 0;
         BOOL isUsername = NO;
         NSString *resource = getResourceFromURL(URL, &type, &isUsername);
