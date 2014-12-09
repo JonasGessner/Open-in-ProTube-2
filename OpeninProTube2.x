@@ -15,6 +15,14 @@ NS_INLINE BOOL pt2Available(void) {
     return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"pt2://"]];
 }
 
+NS_INLINE BOOL ptAvailable(void) {
+    return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"protube://"]];
+}
+
+NS_INLINE BOOL anyAvailable(void) {
+    return ptAvailable() || pt2Available();
+}
+
 NS_INLINE NSDictionary *dictionaryWithQueryString(NSString *string) {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     
@@ -250,16 +258,18 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 publicURLsOnly:(BOOL)arg3 animating:(BOOL)arg4 additionalActivationFlag:(unsigned int)arg5 {
-    PTURLResourceType type = 0;
-    BOOL isUsername = NO;
-    NSString *resource = getResourceFromURL(URL, &type, &isUsername);
-    
-    if (resource != nil) {
-        NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+    if (anyAvailable) {
+        PTURLResourceType type = 0;
+        BOOL isUsername = NO;
+        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
         
-        if (ptURL != nil) {
-            [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
-            return;
+        if (resource != nil) {
+            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            
+            if (ptURL != nil) {
+                [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
+                return;
+            }
         }
     }
     
@@ -277,16 +287,18 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 {
-    PTURLResourceType type = 0;
-    BOOL isUsername = NO;
-    NSString *resource = getResourceFromURL(URL, &type, &isUsername);
-    
-    if (resource != nil) {
-        NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+    if (anyAvailable) {
+        PTURLResourceType type = 0;
+        BOOL isUsername = NO;
+        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
         
-        if (ptURL != nil) {
-            [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
-            return;
+        if (resource != nil) {
+            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            
+            if (ptURL != nil) {
+                [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
+                return;
+            }
         }
     }
     
@@ -303,16 +315,18 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 activationHandler:(id)arg6 {
-    PTURLResourceType type = 0;
-    BOOL isUsername = NO;
-    NSString *resource = getResourceFromURL(URL, &type, &isUsername);
-    
-    if (resource != nil) {
-        NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+    if (anyAvailable) {
+        PTURLResourceType type = 0;
+        BOOL isUsername = NO;
+        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
         
-        if (ptURL != nil) {
-            [[UIApplication sharedApplication] openURL:ptURL];
-            return;
+        if (resource != nil) {
+            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            
+            if (ptURL != nil) {
+                [[UIApplication sharedApplication] openURL:ptURL];
+                return;
+            }
         }
     }
     
@@ -330,16 +344,18 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationContext:(id)arg5 activationHandler:(id)arg6 {
-    PTURLResourceType type = 0;
-    BOOL isUsername = NO;
-    NSString *resource = getResourceFromURL(URL, &type, &isUsername);
-    
-    if (resource != nil) {
-        NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+    if (anyAvailable) {
+        PTURLResourceType type = 0;
+        BOOL isUsername = NO;
+        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
         
-        if (ptURL != nil) {
-            [[UIApplication sharedApplication] openURL:ptURL];
-            return;
+        if (resource != nil) {
+            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            
+            if (ptURL != nil) {
+                [[UIApplication sharedApplication] openURL:ptURL];
+                return;
+            }
         }
     }
     
@@ -358,16 +374,18 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 %hook SpringBoard
 
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationSettings:(id)arg5 withResult:(id)arg6 {
-    PTURLResourceType type = 0;
-    BOOL isUsername = NO;
-    NSString *resource = getResourceFromURL(URL, &type, &isUsername);
-    
-    if (resource != nil) {
-        NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+    if (anyAvailable) {
+        PTURLResourceType type = 0;
+        BOOL isUsername = NO;
+        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
         
-        if (ptURL != nil) {
-            [[UIApplication sharedApplication] openURL:ptURL];
-            return;
+        if (resource != nil) {
+            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            
+            if (ptURL != nil) {
+                [[UIApplication sharedApplication] openURL:ptURL];
+                return;
+            }
         }
     }
     
@@ -420,32 +438,6 @@ NS_INLINE NSString *getPT2Path(void) {
     
     return path;
 }
-
-//NS_INLINE NSString *getPTPath(void) {
-//    NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-//
-//    if (!searchPaths.count) {
-//        return nil;
-//    }
-//
-//    NSString *pathFile = [[searchPaths firstObject] stringByAppendingPathComponent:@"Caches/com.apple.mobile.installation.plist"];
-//
-//    if (![[NSFileManager defaultManager] fileExistsAtPath:pathFile]) {
-//        pathFile = [[searchPaths firstObject] stringByAppendingPathComponent:@"MobileInstallation/LastLaunchServicesMap.plist"];
-//    }
-//
-//    NSDictionary *file = [NSDictionary dictionaryWithContentsOfFile:pathFile];
-//    NSDictionary *user = file[@"System"];
-//    NSDictionary *pt = user[@"de.j-gessner.ProTube"];
-//
-//    if (!pt) {
-//        return nil;
-//    }
-//
-//    NSString *path = pt[@"Path"];
-//
-//    return path;
-//}
 
 #ifndef NSFoundationVersionNumber_iOS_8_0
 #define NSFoundationVersionNumber_iOS_8_0 1139.10
