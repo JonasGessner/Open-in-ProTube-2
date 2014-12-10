@@ -50,7 +50,8 @@ NS_INLINE NSDictionary *dictionaryWithQueryString(NSString *string) {
 typedef NS_ENUM(NSUInteger, PTURLResourceType) {
     PTURLResourceTypeNone = 0,
     PTURLResourceTypeVideo,
-    PTURLResourceTypeChannel,
+    PTURLResourceTypeUserName,
+    PTURLResourceTypeChannelID,
     PTURLResourceTypePlaylist,
     PTURLResourceTypeSearch
 };
@@ -193,7 +194,7 @@ NS_INLINE NSString *videoIDFromURL(NSURL *URL) {
 }
 
 //Type cannot be nil
-NS_INLINE NSString *getResourceFromURL(NSURL *URL, PTURLResourceType *type, BOOL *channelIsUser) {
+NS_INLINE NSString *getResourceFromURL(NSURL *URL, PTURLResourceType *type) {
     NSString *videoID = videoIDFromURL(URL);
     
     if (videoID) {
@@ -201,10 +202,17 @@ NS_INLINE NSString *getResourceFromURL(NSURL *URL, PTURLResourceType *type, BOOL
         return videoID;
     }
     
-    NSString *channel = channelIDFromURL(URL, channelIsUser);
+    BOOL username = NO;
+    
+    NSString *channel = channelIDFromURL(URL, &username);
     
     if (channel) {
-        *type = PTURLResourceTypeChannel;
+        if (username) {
+            *type = PTURLResourceTypeUserName;
+        }
+        else {
+            *type = PTURLResourceTypeChannelID;
+        }
         return channel;
     }
     
@@ -225,7 +233,7 @@ NS_INLINE NSString *getResourceFromURL(NSURL *URL, PTURLResourceType *type, BOOL
     return nil;
 }
 
-NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelIsUser) {
+NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type) {
     BOOL pt2 = pt2Available();
     
     NSMutableString *URLString = [NSMutableString stringWithString:(pt2 ? @"pt2://" : @"protube://")];
@@ -241,13 +249,11 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
     else if (type == PTURLResourceTypePlaylist && pt2) {
         [URLString appendFormat:@"playlist/%@", resource];
     }
-    else if (type == PTURLResourceTypeChannel && pt2) {
-        if (channelIsUser) {
-            [URLString appendFormat:@"user/%@", resource];
-        }
-        else {
-            [URLString appendFormat:@"channel/%@", resource];
-        }
+    else if (type == PTURLResourceTypeUserName && pt2) {
+        [URLString appendFormat:@"user/%@", resource];
+    }
+    else if (type == PTURLResourceTypeChannelID && pt2) {
+        [URLString appendFormat:@"channel/%@", resource];
     }
     else if (type == PTURLResourceTypeSearch && pt2) {
         [URLString appendFormat:@"search/%@", resource];
@@ -266,11 +272,10 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 publicURLsOnly:(BOOL)arg3 animating:(BOOL)arg4 additionalActivationFlag:(unsigned int)arg5 {
     if (anyAvailable() && isValidURL(URL)) {
         PTURLResourceType type = 0;
-        BOOL isUsername = NO;
-        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
+        NSString *resource = getResourceFromURL(URL, &type);
         
         if (resource != nil) {
-            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            NSURL *ptURL = buildProTubeURL(resource, type);
             
             if (ptURL != nil) {
                 [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
@@ -295,11 +300,10 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 {
     if (anyAvailable() && isValidURL(URL)) {
         PTURLResourceType type = 0;
-        BOOL isUsername = NO;
-        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
+        NSString *resource = getResourceFromURL(URL, &type);
         
         if (resource != nil) {
-            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            NSURL *ptURL = buildProTubeURL(resource, type);
             
             if (ptURL != nil) {
                 [(SBUserAgent *)[%c(SBUserAgent) sharedUserAgent] openURL:ptURL animateIn:YES scale:0.0f start:0.0f duration:0.3f animateOut:YES];
@@ -323,11 +327,10 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 additionalActivationFlags:(id)arg5 activationHandler:(id)arg6 {
     if (anyAvailable() && isValidURL(URL)) {
         PTURLResourceType type = 0;
-        BOOL isUsername = NO;
-        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
+        NSString *resource = getResourceFromURL(URL, &type);
         
         if (resource != nil) {
-            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            NSURL *ptURL = buildProTubeURL(resource, type);
             
             if (ptURL != nil) {
                 [[UIApplication sharedApplication] openURL:ptURL];
@@ -352,11 +355,10 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationContext:(id)arg5 activationHandler:(id)arg6 {
     if (anyAvailable() && isValidURL(URL)) {
         PTURLResourceType type = 0;
-        BOOL isUsername = NO;
-        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
+        NSString *resource = getResourceFromURL(URL, &type);
         
         if (resource != nil) {
-            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            NSURL *ptURL = buildProTubeURL(resource, type);
             
             if (ptURL != nil) {
                 [[UIApplication sharedApplication] openURL:ptURL];
@@ -382,11 +384,10 @@ NSURL *buildProTubeURL(NSString *resource, PTURLResourceType type, BOOL channelI
 - (void)_openURLCore:(NSURL *)URL display:(id)arg2 animating:(BOOL)arg3 sender:(id)arg4 activationSettings:(id)arg5 withResult:(id)arg6 {
     if (anyAvailable() && isValidURL(URL)) {
         PTURLResourceType type = 0;
-        BOOL isUsername = NO;
-        NSString *resource = getResourceFromURL(URL, &type, &isUsername);
+        NSString *resource = getResourceFromURL(URL, &type);
         
         if (resource != nil) {
-            NSURL *ptURL = buildProTubeURL(resource, type, isUsername);
+            NSURL *ptURL = buildProTubeURL(resource, type);
             
             if (ptURL != nil) {
                 [[UIApplication sharedApplication] openURL:ptURL];
