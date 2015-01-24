@@ -47,6 +47,14 @@ NS_INLINE NSDictionary *dictionaryWithQueryString(NSString *string) {
     return dictionary.copy;
 }
 
+NS_INLINE NSString *decodeFromPercentEscapedString(NSString *string) {
+#if __has_feature(objc_arc)
+    return (__bridge_transfer NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (__bridge CFStringRef)string, CFSTR(""), kCFStringEncodingUTF8);
+#else
+    return (NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef)string, CFSTR(""), kCFStringEncodingUTF8);
+#endif
+}
+
 typedef NS_ENUM(NSUInteger, PTURLResourceType) {
     PTURLResourceTypeNone = 0,
     PTURLResourceTypeVideo,
@@ -80,7 +88,6 @@ NS_INLINE NSString *searchTermFromURL(NSURL *URL) {
     
     return nil;
 }
-
 
 NS_INLINE NSString *playlistIDFromURL(NSURL *URL) {
     NSString *host = URL.host;
@@ -184,9 +191,17 @@ NS_INLINE NSString *videoIDFromURL(NSURL *URL) {
                 NSDictionary *dict = dictionaryWithQueryString(URL.query);
                 return dict[@"v"];
             }
+            else if ([URL.path isEqualToString:@"/attribution_link"]) {
+                NSDictionary *dict = dictionaryWithQueryString(URL.query);
+                NSString *u = decodeFromPercentEscapedString(dict[@"u"]);
+                
+                dict = dictionaryWithQueryString([u componentsSeparatedByString:@"?"].lastObject);
+                
+                return dict[@"v"];
+            }
         }
         else if ([host isEqualToString:@"youtu.be"]) {
-            return [URL.path substringFromIndex:1];
+            return (URL.path.length > 0 ?  [URL.path substringFromIndex:1] : nil);
         }
     }
     
