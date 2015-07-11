@@ -1,7 +1,7 @@
 Package: de.j-gessner.openinprotube2
 Name: Open in ProTube 2
 Depends: mobilesubstrate, firmware (>= 5.0)
-Version: 2.0.3
+Version: 2.0.4
 Architecture: iphoneos-arm
 Description: An awesome Cydia Substrate tweak!
 Author: Jonas Gessner

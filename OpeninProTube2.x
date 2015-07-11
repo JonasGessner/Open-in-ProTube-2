@@ -175,34 +175,37 @@ NS_INLINE NSString *channelIDFromURL(NSURL *URL, BOOL *channelName) {
 
 NS_INLINE NSString *videoIDFromURL(NSURL *URL) {
     if ([URL.scheme isEqualToString:@"youtube"]) {
-        return URL.resourceSpecifier;
-    }
-    else {
-        NSString *host = URL.host;
-        if ([host hasPrefix:@"www."]) {
-            host = [host substringFromIndex:4];
-        }
-        else if ([host hasPrefix:@"m."]) {
-            host = [host substringFromIndex:2];
-        }
+        NSString *resource = URL.resourceSpecifier;
         
-        if ([host isEqualToString:@"youtube.com"]) {
-            if ([URL.path isEqualToString:@"/watch"]) {
-                NSDictionary *dict = dictionaryWithQueryString(URL.query);
-                return dict[@"v"];
-            }
-            else if ([URL.path isEqualToString:@"/attribution_link"]) {
-                NSDictionary *dict = dictionaryWithQueryString(URL.query);
-                NSString *u = decodeFromPercentEscapedString(dict[@"u"]);
-                
-                dict = dictionaryWithQueryString([u componentsSeparatedByString:@"?"].lastObject);
-                
-                return dict[@"v"];
-            }
+        if (resource.length == 11) {
+            return resource;
         }
-        else if ([host isEqualToString:@"youtu.be"]) {
-            return (URL.path.length > 0 ?  [URL.path substringFromIndex:1] : nil);
+    }
+    
+    NSString *host = URL.host;
+    if ([host hasPrefix:@"www."]) {
+        host = [host substringFromIndex:4];
+    }
+    else if ([host hasPrefix:@"m."]) {
+        host = [host substringFromIndex:2];
+    }
+    
+    if ([host isEqualToString:@"youtube.com"]) {
+        if ([URL.path isEqualToString:@"/watch"]) {
+            NSDictionary *dict = dictionaryWithQueryString(URL.query);
+            return dict[@"v"];
         }
+        else if ([URL.path isEqualToString:@"/attribution_link"]) {
+            NSDictionary *dict = dictionaryWithQueryString(URL.query);
+            NSString *u = decodeFromPercentEscapedString(dict[@"u"]);
+            
+            dict = dictionaryWithQueryString([u componentsSeparatedByString:@"?"].lastObject);
+            
+            return dict[@"v"];
+        }
+    }
+    else if ([host isEqualToString:@"youtu.be"]) {
+        return (URL.path.length > 0 ?  [URL.path substringFromIndex:1] : nil);
     }
     
     return nil;
